@@ -5,5 +5,6 @@
 
 1. `.agent/rules/architecture.md` (Hono/Vite/Zodのアーキテクチャルール)
 2. `.agent/rules/claude.md` (エージェントの振る舞い・テンプレート)
+3. `.agent/rules/design.md` (UI/UXデザインルール・トークン)
 
 これらのルール（特にZodスキーマから定義を始めること）を無視した実装を行わないでください。
