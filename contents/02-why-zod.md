@@ -1,42 +1,97 @@
 # なぜ Zod を「型の源泉」にするのか
 
-> **前提知識:** Java のクラスやインターフェースによる型定義の経験がある
+> **前提知識:** Java Servlet + JSP でデータの受け渡しを経験している
 
 ---
 
-## 1. Java の世界での「型」
+## 1. 「JSP でもデータは渡せるけど？」
 
-Java では、データの構造はクラスで定義する：
+そう、Servlet → JSP でデータを渡すのはできる。こうやって：
 
 ```java
+// Servlet 側
+List<User> userList = userDao.findAll();
+request.setAttribute("users", userList);
+RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/userList.jsp");
+rd.forward(request, response);
+```
+
+```jsp
+<!-- JSP 側 -->
+<c:forEach var="user" items="${users}">
+  <tr>
+    <td>${user.name}</td>
+    <td>${user.email}</td>
+  </tr>
+</c:forEach>
+```
+
+動く。変数も「貫通」している。  
+**じゃあ何が問題なのか？こういう経験がないか？**
+
+---
+
+### 🪤 地雷 1: 名前のズレに実行するまで気づけない
+
+```java
+// Servlet で "userList" としてセット
+request.setAttribute("userList", users);
+```
+
+```jsp
+<!-- JSP で "users" として受け取ろうとする -->
+<c:forEach var="user" items="${users}">  <%-- 何も表示されない。エラーも出ない。 --%>
+```
+
+**30分悩んで、属性名が `userList` なのに `users` で受けていたことに気づく。**  
+EL式 `${}` は存在しない属性を参照しても **null（空）を返すだけでエラーにならない。** 静かに壊れる。
+
+### 🪤 地雷 2: フィールド名のタイポ
+
+```jsp
+<td>${user.naem}</td>  <%-- name のタイポ。空欄になるだけ。 --%>
+```
+
+Java のクラスには `name` フィールドがある。でも JSP の EL 式は **文字列ベース** だ。  
+`naem` と書いてもコンパイルエラーにならない。ページを開いて「あれ、空だな」と気づくまでわからない。
+
+### 🪤 地雷 3: フィールドを追加したのに JSP を直し忘れる
+
+```java
+// User クラスに phone を追加した
 public class User {
-    private int id;
     private String name;
     private String email;
-    // getter, setter, constructor...
+    private String phone;  // ← 新規追加
 }
 ```
 
-この `User` クラスは **コンパイル時** に型チェックされる。  
-`user.getName()` は String を返す。型が違えばコンパイルエラー。素晴らしい。
-
-**でも、外の世界からデータが来たらどうだろう？**
-
-```java
-// フォームからのリクエスト
-String name = request.getParameter("name");  // null かもしれない
-String age = request.getParameter("age");    // "abc" かもしれない
-int ageInt = Integer.parseInt(age);          // 💥 NumberFormatException!
-```
-
-Java の型システムは、**外部入力を信じてくれない**。当然だ。  
-だから手動でバリデーション（検証）を書く。何度も、何度も。
+Servlet は `phone` をセットしている。でも JSP に `${user.phone}` を追加し忘れた。  
+**コンパイルは通る。テストも通る（既存の画面は壊れないから）。**  
+「あれ、電話番号の列がないぞ」と誰かが気づくまで放置される。
 
 ---
 
-## 2. TypeScript の「型」の限界
+### これらに共通する問題
 
-TypeScript に移ると、型はさらにトリッキーになる。
+**Servlet（Java）と JSP（テンプレート）の間には「型の断絶」がある。**
+
+- Java 側は型がある → `user.getName()` のタイポはコンパイルエラー ✅
+- JSP 側は文字列 → `${user.naem}` のタイポは **実行するまで気づけない** ❌
+
+```
+Java (型あり) ──setAttribute()──→ JSP (型なし・文字列ベース)
+                    ↑
+               ここで型が消える
+```
+
+この「型の断絶」を **構造的に不可能にする** のが、Zod + TypeScript の仕組み。
+
+---
+
+## 2. じゃあ TypeScript なら解決する？ — 半分だけ
+
+TypeScript に移ると、型はフロントエンドにも書ける。でも落とし穴がある。
 
 ```typescript
 // 型を定義
@@ -61,6 +116,9 @@ const user: User = JSON.parse('{"id": "abc", "name": 123}');
 
 Java のクラスは実行時にも存在する（リフレクション等）。  
 TypeScript の `type` は実行時には**ただの幻**。
+
+**つまり TypeScript だけでは、JSP の地雷を半分しか防げない。**  
+コード内のタイポは防げるが、外部からの不正なデータは素通りする。
 
 ---
 
