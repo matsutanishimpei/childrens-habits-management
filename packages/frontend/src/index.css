@@ -1,0 +1,574 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Kiwi+Maru:wght@400;500;700&display=swap');
+
+:root {
+  /* Design Tokens - Warm Minimalism */
+  --bg-primary: #FCFCFC;      /* 暖かみのあるオフホワイト */
+  --bg-secondary: #F5F5F4;    /* Stone系の柔らかいグレー */
+  --bg-surface: #FFFFFF;      /* カード用 */
+  --text-primary: #1C1917;    /* インクのような深みのある黒 */
+  --text-secondary: #57534E;  /* 落ち着いた補足テキスト */
+  --text-tertiary: #A8A29E;   /* プレースホルダー */
+  --brand-primary: #292524;   /* メインボタンなど */
+  --brand-hover: #44403C;     /* ボタンホバー */
+  --accent-muted: #0D9488;    /* 落ち着いたティール */
+  --accent-soft: #CCFBF1;     /* ティール背景 */
+  --border-subtle: #E7E5E4;   /* 薄い区切り線 */
+  
+  --font-sans: 'Kiwi Maru', 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-kids: 'Kiwi Maru', 'Inter', sans-serif;
+  
+  --radius-base: 12px;
+  --radius-card: 18px;
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography helper */
+.font-kids {
+  font-family: var(--font-kids);
+}
+
+/* Custom Utilities for Warm Minimalism */
+.card-shadow {
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.05), 0 1px 2px rgba(28, 25, 23, 0.02);
+}
+
+.card-shadow-hover:hover {
+  box-shadow: 0 4px 12px rgba(28, 25, 23, 0.08), 0 2px 4px rgba(28, 25, 23, 0.03);
+  transform: translateY(-2px);
+}
+
+/* Custom Scrollbar for Stock */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Focus styles */
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--text-tertiary);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--text-secondary);
+}
+
+
+
+/* Modal Styling (Vanilla CSS fallback for Tailwind) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(28, 25, 23, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.modal-content {
+  background-color: var(--bg-surface);
+  width: 100%;
+  max-width: 448px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  padding: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Bottom Navigation Styling for Mobile */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(28, 25, 23, 0.03);
+}
+
+.bottom-nav-placeholder {
+  height: 80px;
+}
+
+.nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 33.33%;
+  transition: var(--transition-smooth);
+}
+
+.nav-button.active {
+  color: var(--accent-muted);
+}
+
+.nav-icon-wrapper {
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: var(--transition-smooth);
+}
+
+.nav-button.active .nav-icon-wrapper {
+  background-color: var(--accent-soft);
+}
+
+/* Icon Selector Styling */
+.icon-select-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.icon-select-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-radius: var(--radius-base);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.icon-select-button:hover {
+  border-color: var(--text-tertiary);
+  background-color: var(--bg-secondary);
+}
+
+.icon-select-button.active {
+  border-color: var(--accent-muted);
+  background-color: var(--accent-soft);
+  color: var(--accent-muted);
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 3px var(--accent-muted);
+}
+
+/* Layout Utilities (Tailwind Emulation) */
+.flex {
+  display: flex !important;
+}
+.flex-col {
+  flex-direction: column !important;
+}
+.flex-row {
+  flex-direction: row !important;
+}
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+.items-center {
+  align-items: center !important;
+}
+.justify-between {
+  justify-content: space-between !important;
+}
+.justify-center {
+  justify-content: center !important;
+}
+.flex-1 {
+  flex: 1 1 0% !important;
+}
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+
+/* Gaps */
+.gap-1\.5 { gap: 6px !important; }
+.gap-2 { gap: 8px !important; }
+.gap-3 { gap: 12px !important; }
+.gap-4 { gap: 16px !important; }
+.gap-5 { gap: 20px !important; }
+.gap-6 { gap: 24px !important; }
+
+/* Grid */
+.grid {
+  display: grid !important;
+}
+.grid-cols-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+/* Custom Task Card Styling for horizontal layout (Max 2 lines) */
+.task-item-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  width: 100% !important;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.05);
+}
+
+.task-item-content {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.task-item-text-group {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0;
+  text-align: left !important;
+}
+
+.task-item-name {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-item-category {
+  font-size: 11px !important;
+  color: var(--text-secondary);
+  margin-top: 2px !important;
+}
+
+.task-item-icon-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px !important;
+  border-radius: var(--radius-base) !important;
+  flex-shrink: 0 !important;
+}
+
+/* ========================================================================= */
+/* 時間帯ボックス（朝・昼・夜）の上品な背景色と枠線 */
+/* ========================================================================= */
+.meal-box-morning {
+  background-color: #FFFDF5 !important; /* 温かみのある淡いイエロー */
+  border: 1.5px solid #F3E8C9 !important; /* くすんだゴールドの細線 */
+  padding: 20px !important;              /* パディングを強制適用 */
+  margin-bottom: 28px !important;        /* ボックス間の余白をはっきり */
+  border-radius: var(--radius-card) !important;
+}
+.meal-box-lunch {
+  background-color: #F2FDFB !important; /* さわやかな淡いミント */
+  border: 1.5px solid #D1F2EB !important; /* ミントの細線 */
+  padding: 20px !important;
+  margin-bottom: 28px !important;
+  border-radius: var(--radius-card) !important;
+}
+.meal-box-dinner {
+  background-color: #F5F7FF !important; /* 落ち着いた淡いブルー */
+  border: 1.5px solid #E1E6FC !important; /* 淡いブルーの細線 */
+  padding: 20px !important;
+  margin-bottom: 28px !important;
+  border-radius: var(--radius-card) !important;
+}
+
+/* ボックス内の各タスクカード (コンテナの中で白く浮かび上がる設計) */
+.task-instance-card {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-base) !important;
+  box-shadow: 0 1.5px 3px rgba(28, 25, 23, 0.05) !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px;
+}
+
+.task-instance-card:hover {
+  border-color: var(--text-tertiary) !important;
+  box-shadow: 0 4px 10px rgba(28, 25, 23, 0.08) !important;
+}
+
+.task-instance-card.completed {
+  background-color: #F5F5F4 !important; /* bg-secondary */
+  border-color: var(--border-subtle) !important;
+  opacity: 0.65 !important;
+  color: var(--text-tertiary) !important;
+  box-shadow: none !important;
+}
+
+/* ========================================================================= */
+/* コピペ操作パネル用ボタン (デフォルト無骨ボタンの完全書き換え) */
+/* ========================================================================= */
+.clipboard-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius-base) !important; /* 角丸 12px */
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+  white-space: nowrap !important; /* 二行折り返しを絶対に防ぐ */
+  line-height: 1 !important;
+  text-decoration: none !important;
+  box-sizing: border-box !important;
+}
+
+.clipboard-btn:active {
+  transform: scale(0.95);
+}
+
+/* コピーボタン (うっすら灰色) */
+.clipboard-btn-copy {
+  background-color: var(--bg-secondary) !important; /* #F5F5F4 */
+  border: 1px solid var(--border-subtle) !important; /* #E7E5E4 */
+  color: var(--text-secondary) !important; /* #57534E */
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.03) !important;
+}
+.clipboard-btn-copy:hover {
+  background-color: var(--border-subtle) !important; /* #E7E5E4 */
+  border-color: var(--text-tertiary) !important; /* #A8A29E */
+}
+
+/* 貼り付けボタン (うっすら灰色) */
+.clipboard-btn-paste {
+  background-color: var(--bg-secondary) !important; /* #F5F5F4 */
+  border: 1px solid var(--border-subtle) !important; /* #E7E5E4 */
+  color: var(--text-secondary) !important; /* #57534E */
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.03) !important;
+}
+.clipboard-btn-paste:hover {
+  background-color: var(--border-subtle) !important; /* #E7E5E4 */
+  border-color: var(--text-tertiary) !important; /* #A8A29E */
+}
+
+/* 平日一括貼り付けボタン (うっすら灰色) */
+.clipboard-btn-weekdays {
+  background-color: var(--bg-secondary) !important; /* #F5F5F4 */
+  border: 1px solid var(--border-subtle) !important; /* #E7E5E4 */
+  color: var(--text-secondary) !important; /* #57534E */
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.03) !important;
+}
+.clipboard-btn-weekdays:hover {
+  background-color: var(--border-subtle) !important; /* #E7E5E4 */
+  border-color: var(--text-tertiary) !important; /* #A8A29E */
+}
+
+/* ========================================================================= */
+/* 追加・印刷・カレンダーボタンのうっすら灰色スタイル書き換え */
+/* ========================================================================= */
+
+/* 各時間帯の「＋追加」ボタン */
+.action-btn-add {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 6px 12px !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  border-radius: 8px !important;
+  background-color: var(--bg-secondary) !important; /* #F5F5F4 */
+  border: 1px solid var(--border-subtle) !important; /* #E7E5E4 */
+  color: var(--text-secondary) !important; /* #57534E */
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.03) !important;
+  line-height: 1 !important;
+}
+
+.action-btn-add:hover {
+  background-color: var(--border-subtle) !important; /* #E7E5E4 */
+  border-color: var(--text-tertiary) !important; /* #A8A29E */
+}
+
+.action-btn-add:active {
+  transform: scale(0.95);
+}
+
+
+
+/* カレンダーの日付選択ボタン */
+.date-select-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 10px 0 !important;
+  border-radius: var(--radius-base) !important;
+  border: 1.5px solid var(--border-subtle) !important;
+  background-color: var(--bg-secondary) !important; /* デフォルトでうっすら灰色 */
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  position: relative !important; /* 子要素のドット配置用 */
+  transition: var(--transition-smooth) !important;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.02) !important;
+}
+
+.date-select-btn:hover {
+  border-color: var(--text-tertiary) !important;
+  background-color: var(--border-subtle) !important; /* ホバー時は少し濃い灰色 */
+}
+
+.date-select-btn.selected {
+  background-color: var(--border-subtle) !important; /* 選択時は少し濃い灰色 */
+  border-color: var(--text-primary) !important; /* 選択時は枠線を強調 */
+  color: var(--text-primary) !important;
+  box-shadow: 0 2px 5px rgba(28, 25, 23, 0.06) !important;
+}
+
+/* カレンダーの予定ありドット */
+.has-plans-dot {
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  position: absolute !important;
+  bottom: 5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background-color: var(--accent-muted) !important; /* 落ち着いたティール */
+}
+
+/* 日付・週切り替えの左右ナビゲーションボタン（シンプルでボタンっぽくないデザイン） */
+.date-nav-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important; /* 丸形 */
+  background-color: transparent !important; /* 背景透明 */
+  border: none !important; /* 枠線なし */
+  color: var(--text-secondary) !important; /* 落ち着いたテキスト色 */
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+  box-shadow: none !important; /* 影なし */
+}
+
+.date-nav-btn:hover {
+  background-color: var(--bg-secondary) !important; /* ホバー時のみうっすら円形背景 */
+  color: var(--text-primary) !important; /* ホバー時に矢印の色を濃く */
+}
+
+.date-nav-btn:active {
+  transform: scale(0.9) !important;
+}
+
+/* 新規タスク追加ボタン（大） */
+.action-btn-add-large {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: var(--radius-base) !important; /* 12px */
+  background-color: var(--bg-secondary) !important; /* #F5F5F4 */
+  border: 1px solid var(--border-subtle) !important; /* #E7E5E4 */
+  color: var(--text-secondary) !important; /* #57534E */
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.03) !important;
+}
+
+.action-btn-add-large:hover {
+  background-color: var(--border-subtle) !important; /* #E7E5E4 */
+  border-color: var(--text-tertiary) !important; /* #A8A29E */
+}
+
+.action-btn-add-large:active {
+  transform: scale(0.92);
+}
+
+/* モーダルの登録ボタン */
+.modal-submit-btn {
+  width: 100% !important;
+  padding: 12px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius-base) !important;
+  background-color: var(--brand-primary) !important; /* シックな石色 */
+  border: 1px solid var(--brand-primary) !important;
+  color: #FFFFFF !important;
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+  margin-top: 8px !important;
+}
+
+.modal-submit-btn:hover {
+  background-color: var(--brand-hover) !important;
+  border-color: var(--brand-hover) !important;
+}
+
+.modal-submit-btn:active {
+  transform: scale(0.98);
+}
+
+/* クイック数値指定ボタン */
+.quick-value-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  background-color: var(--bg-secondary) !important; /* #F5F5F4 */
+  border: 1px solid var(--border-subtle) !important; /* #E7E5E4 */
+  color: var(--text-secondary) !important; /* #57534E */
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.quick-value-btn:hover {
+  background-color: var(--border-subtle) !important;
+  border-color: var(--text-tertiary) !important;
+}
+
+.quick-value-btn.selected {
+  background-color: var(--accent-muted) !important; /* #0D9488 */
+  border-color: var(--accent-muted) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 1px 2px rgba(13, 148, 136, 0.2) !important;
+}
+
+
+
+
