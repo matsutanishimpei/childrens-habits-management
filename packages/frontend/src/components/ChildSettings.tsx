@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Users } from 'lucide-react';
+import { Plus, Trash2, Users, X } from 'lucide-react';
 import { Child } from '@my-app/shared';
 
 interface ChildSettingsProps {
@@ -14,23 +14,35 @@ export const ChildSettings: React.FC<ChildSettingsProps> = ({
   handleDeleteChild,
 }) => {
   const [newChildName, setNewChildName] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newChildName.trim()) return;
     handleCreateChild(newChildName);
     setNewChildName('');
+    setShowForm(false);
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* 子ども追加フォーム */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 card-shadow flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
+      {/* ヘッダー: タスク設定と同じレイアウト */}
+      <div className="bg-white p-4 rounded-2xl border border-stone-200 card-shadow flex justify-between items-center">
         <div>
           <h2 className="text-md font-bold text-stone-800">子ども設定</h2>
           <p className="text-xs text-stone-500">新しく子どもを登録したり、削除します</p>
         </div>
-        
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="action-btn-add-large"
+          title="新しい子どもを登録"
+        >
+          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* 追加フォーム（トグル表示） */}
+      {showForm && (
         <form onSubmit={handleSubmit} className="flex gap-2.5">
           <input
             type="text"
@@ -38,21 +50,22 @@ export const ChildSettings: React.FC<ChildSettingsProps> = ({
             onChange={(e) => setNewChildName(e.target.value)}
             placeholder="子どもの名前 (例: たろう)"
             maxLength={10}
-            className="flex-1 px-4 py-2.5 border border-stone-200 rounded-xl text-sm"
+            className="flex-1 px-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2 transition-all"
+            autoFocus
             required
           />
           <button
             type="submit"
-            className="px-4 py-2.5 bg-stone-800 hover:bg-stone-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+            className="px-5 py-2.5 bg-stone-800 hover:bg-stone-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95"
           >
             <Plus className="w-4 h-4" />
             登録
           </button>
         </form>
-      </div>
+      )}
 
       {/* 子ども一覧 */}
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2">
         {childrenList.map((child) => (
           <div
             key={child.id}
@@ -83,6 +96,12 @@ export const ChildSettings: React.FC<ChildSettingsProps> = ({
             )}
           </div>
         ))}
+
+        {childrenList.length === 0 && (
+          <div className="text-center py-10 bg-white border border-dashed border-stone-200 rounded-xl text-stone-400 italic text-xs">
+            子どもが登録されていません。上のボタンから追加してください。
+          </div>
+        )}
       </div>
     </div>
   );
