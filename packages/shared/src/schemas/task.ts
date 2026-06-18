@@ -1,10 +1,16 @@
 import { z } from 'zod';
 
+export const ChildSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, '名前を入力してください'),
+});
+
 export const TaskSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'タスク名を入力してください'),
   icon: z.string().default('pencil'),
   category: z.enum(['homework', 'habit', 'other']).default('homework'),
+  childId: z.string(),
 });
 
 export const DailyTaskInstanceSchema = z.object({
@@ -21,6 +27,7 @@ export const DayPlanSchema = z.object({
   dinner: z.array(DailyTaskInstanceSchema).default([]),
 });
 
+export type Child = z.infer<typeof ChildSchema>;
 export type Task = z.infer<typeof TaskSchema>;
 export type DailyTaskInstance = z.infer<typeof DailyTaskInstanceSchema>;
 export type DayPlan = z.infer<typeof DayPlanSchema>;

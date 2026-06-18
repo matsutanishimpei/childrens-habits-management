@@ -130,7 +130,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   font-size: 10px;
   font-weight: 600;
   cursor: pointer;
-  width: 33.33%;
+  flex: 1;
   transition: var(--transition-smooth);
 }
 
@@ -567,6 +567,44 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   border-color: var(--accent-muted) !important;
   color: #FFFFFF !important;
   box-shadow: 0 1px 2px rgba(13, 148, 136, 0.2) !important;
+}
+
+/* Child Selector Styling - Capsule Pill Buttons */
+.child-selector-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-subtle) !important;
+  padding: 4px !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.02) !important;
+}
+
+.child-selector-btn {
+  background: none !important;
+  border: 1px solid transparent !important;
+  border-radius: 9999px !important;
+  padding: 6px 18px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  transition: var(--transition-smooth) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.child-selector-btn:hover {
+  background-color: var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+}
+
+.child-selector-btn.active {
+  background-color: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.1) !important;
 }
 
 
