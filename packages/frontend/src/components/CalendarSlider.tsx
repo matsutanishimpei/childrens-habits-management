@@ -1,5 +1,6 @@
 import React from 'react';
 import { DayPlan } from '@my-app/shared';
+import { toLocalISOString } from '../utils/date';
 
 interface CalendarSliderProps {
   weekDates: Date[];
@@ -19,13 +20,13 @@ export const CalendarSlider: React.FC<CalendarSliderProps> = ({
   return (
     <div className="grid grid-cols-7 gap-1.5">
       {weekDates.map(date => {
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = toLocalISOString(date);
         const isSelected = selectedDate === dateStr;
         const plan = getDayPlan(dateStr);
         const hasPlans = (plan.morning?.length || 0) > 0 || 
                          (plan.lunch?.length || 0) > 0 || 
                          (plan.dinner?.length || 0) > 0;
-        const isToday = new Date().toISOString().split('T')[0] === dateStr;
+        const isToday = toLocalISOString(new Date()) === dateStr;
         const dayOfWeek = date.getDay();
         const dayLabel = ['日', '月', '火', '水', '木', '金', '土'][dayOfWeek];
         const dayColorClass = dayOfWeek === 6 

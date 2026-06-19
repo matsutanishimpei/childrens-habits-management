@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import client from '../lib/hc';
 import { Child, Task, DayPlan, DailyTaskInstance, Family } from '@my-app/shared';
+import { toLocalISOString } from '../utils/date';
 
 export const UNITS = ['ページ', '回', '問', '章', '分'] as const;
 export type UnitType = typeof UNITS[number];
@@ -44,7 +45,7 @@ export const useApp = () => {
   const [loading, setLoading] = useState<boolean>(false);
   
   const [selectedDate, setSelectedDate] = useState<string>(() => {
-    return new Date().toISOString().split('T')[0];
+    return toLocalISOString(new Date());
   });
   
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
@@ -179,10 +180,10 @@ export const useApp = () => {
     setCurrentWeekStart(newStart);
   };
 
-  const offsetSelectedDate = (days: number) => {
+  const offsetSelectedDate = (offset: number) => {
     const current = new Date(selectedDate);
-    current.setDate(current.getDate() + days);
-    setSelectedDate(current.toISOString().split('T')[0]);
+    current.setDate(current.getDate() + offset);
+    setSelectedDate(toLocalISOString(current));
   };
 
   const handleCreateTask = async (name: string, icon: string, category: 'homework' | 'habit' | 'other') => {
@@ -299,11 +300,13 @@ export const useApp = () => {
   const pasteToWeekdays = async () => {
     if (!copiedPlan || !activeChild) return;
 
-    const weekdaysStrs = [0, 1, 2, 3, 4].map(i => {
+    // Monday to Friday dates of the currently selected week
+    const dates: string[] = [];
+    for (let i = 0; i < 5; i++) {
       const d = new Date(currentWeekStart);
       d.setDate(currentWeekStart.getDate() + i);
-      return d.toISOString().split('T')[0];
-    });
+      dates.push(toLocalISOString(d));
+    }
 
     const cloneInstances = (instances: DailyTaskInstance[]) => {
       return instances.map(inst => ({
@@ -313,7 +316,7 @@ export const useApp = () => {
       }));
     };
 
-    const updatedPlans = weekdaysStrs.map(dateStr => ({
+    const updatedPlans = dates.map(dateStr => ({
       date: dateStr,
       morning: cloneInstances(copiedPlan.morning),
       lunch: cloneInstances(copiedPlan.lunch),
@@ -321,7 +324,7 @@ export const useApp = () => {
     }));
 
     setDayPlans(prev => {
-      const filtered = prev.filter(p => !weekdaysStrs.includes(p.date));
+      const filtered = prev.filter(p => !dates.includes(p.date));
       return [...filtered, ...updatedPlans];
     });
 

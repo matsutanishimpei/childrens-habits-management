@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { DayPlan } from '@my-app/shared';
+import { toLocalISOString } from '../utils/date';
 
 interface MonthCalendarProps {
   dayPlans: DayPlan[];
@@ -44,20 +45,20 @@ const buildMonthCells = (year: number, month: number) => {
   for (let i = startDayIndex - 1; i >= 0; i--) {
     const d = prevMonthLastDay - i;
     const date = new Date(year, month - 1, d);
-    cells.push({ day: d, inMonth: false, dateStr: date.toISOString().split('T')[0] });
+    cells.push({ day: d, inMonth: false, dateStr: toLocalISOString(date) });
   }
 
   // 当月
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(year, month, d);
-    cells.push({ day: d, inMonth: true, dateStr: date.toISOString().split('T')[0] });
+    cells.push({ day: d, inMonth: true, dateStr: toLocalISOString(date) });
   }
 
   // 翌月埋め（6行 = 42セル）
   const remaining = 42 - cells.length;
   for (let i = 1; i <= remaining; i++) {
     const date = new Date(year, month + 1, i);
-    cells.push({ day: i, inMonth: false, dateStr: date.toISOString().split('T')[0] });
+    cells.push({ day: i, inMonth: false, dateStr: toLocalISOString(date) });
   }
 
   return cells;
@@ -193,7 +194,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   const prevYear = prevDate.getFullYear();
   const prevMonth = prevDate.getMonth();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = toLocalISOString(new Date());
 
   return (
     <div className="flex flex-col gap-5">

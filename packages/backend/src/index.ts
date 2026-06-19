@@ -89,7 +89,7 @@ const routes = app
 
       setCookie(c, 'token', token, {
         httpOnly: true,
-        secure: true,
+        secure: c.req.url.startsWith('https://'),
         sameSite: 'Lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 365
@@ -128,7 +128,7 @@ const routes = app
 
       setCookie(c, 'token', token, {
         httpOnly: true,
-        secure: true,
+        secure: c.req.url.startsWith('https://'),
         sameSite: 'Lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 365
