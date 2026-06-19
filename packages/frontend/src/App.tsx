@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, ChevronLeft, ChevronRight, CheckSquare, Calendar, Award, Settings,
-  Copy, Clipboard, Users
+  Copy, Clipboard, Users, LogOut
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useApp } from './hooks/useApp';
@@ -46,7 +46,8 @@ export const App = () => {
     handleCreateChild,
     handleDeleteChild,
     handleLogin,
-    handleRegister
+    handleRegister,
+    handleLogout
   } = useApp();
 
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -153,6 +154,16 @@ export const App = () => {
             activeChild={activeChild}
             setActiveChild={setActiveChild}
           />
+          
+          {/* ログアウトボタン */}
+          <button
+            onClick={handleLogout}
+            className="date-nav-btn"
+            title="ログアウト"
+            style={{ marginLeft: '4px' }}
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
