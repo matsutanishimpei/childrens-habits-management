@@ -12,9 +12,12 @@ import { TaskSettings } from './components/TaskSettings';
 import { AddTaskModal } from './components/AddTaskModal';
 import { ChildSettings } from './components/ChildSettings';
 import { MonthCalendar } from './components/MonthCalendar';
+import { AuthView } from './components/AuthView';
 
 export const App = () => {
   const {
+    family,
+    authLoading,
     activeTab,
     setActiveTab,
     children,
@@ -41,7 +44,10 @@ export const App = () => {
     pasteToDayPlan,
     pasteToWeekdays,
     handleCreateChild,
-    handleDeleteChild
+    handleDeleteChild,
+    handleLogin,
+    handleRegister,
+    handleLogout
   } = useApp();
 
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -59,12 +65,32 @@ export const App = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
         <div className="flex flex-col items-center gap-2">
           <div className="w-8 h-8 border-4 border-stone-800 border-t-transparent rounded-full animate-spin" />
           <span className="text-xs font-bold text-stone-500">よみこみ中...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!family) {
+    return (
+      <AuthView
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+      />
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-4 border-stone-800 border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-bold text-stone-500">データをロード中...</span>
         </div>
       </div>
     );
@@ -108,22 +134,34 @@ export const App = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {/* 画面ヘッダー */}
-      <header className="no-print border-b border-stone-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-10 card-shadow">
+      <header className="no-print border-b border-stone-200 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center bg-white sticky top-0 z-10 card-shadow">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: 'var(--brand-primary)' }}>
             <Sparkles className="w-5 h-5 text-teal-400" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold tracking-tight text-stone-900">子どもたちの習慣管理</h1>
+          <div className="text-left">
+            <h1 className="text-lg font-bold tracking-tight text-stone-900 leading-tight">子どもたちの習慣管理</h1>
+            <p className="text-[10px] text-stone-400 font-bold leading-tight mt-0.5">{family.name}</p>
           </div>
         </div>
         
-        {/* 子ども選択UI */}
-        <ChildSelector
-          childrenList={children}
-          activeChild={activeChild}
-          setActiveChild={setActiveChild}
-        />
+        <div className="flex items-center gap-3">
+          {/* 子ども選択UI */}
+          <ChildSelector
+            childrenList={children}
+            activeChild={activeChild}
+            setActiveChild={setActiveChild}
+          />
+
+          {/* ログアウトボタン */}
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-500 hover:text-stone-800 hover:bg-stone-50 text-[11px] font-bold transition-all"
+            title="ログアウト"
+          >
+            ログアウト
+          </button>
+        </div>
       </header>
 
       {/* メインビューエリア */}

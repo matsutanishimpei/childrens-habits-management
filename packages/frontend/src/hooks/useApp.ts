@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import client from '../lib/hc';
-import { Child, Task, DayPlan, DailyTaskInstance } from '@my-app/shared';
+import { Child, Task, DayPlan, DailyTaskInstance, Family } from '@my-app/shared';
 
 export const UNITS = ['ページ', '回', '問', '章', '分'] as const;
 export type UnitType = typeof UNITS[number];
@@ -34,12 +34,14 @@ export const isCustomValue = (val: string | undefined, unit: UnitType): boolean 
 };
 
 export const useApp = () => {
+  const [family, setFamily] = useState<Family | null>(null);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'today' | 'plan' | 'calendar' | 'tasks' | 'children'>('today');
   const [children, setChildren] = useState<Child[]>([]);
   const [activeChild, setActiveChild] = useState<Child | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [dayPlans, setDayPlans] = useState<DayPlan[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     return new Date().toISOString().split('T')[0];
@@ -60,9 +62,38 @@ export const useApp = () => {
     dinner: DailyTaskInstance[];
   } | null>(null);
 
-  // Load children on mount
+  // Check active session on mount
   useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await client.api.auth.me.$get();
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            setFamily(data.family);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to check session", err);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    checkSession();
+  }, []);
+
+  // Load children when family logs in
+  useEffect(() => {
+    if (!family) {
+      setChildren([]);
+      setActiveChild(null);
+      setTasks([]);
+      setDayPlans([]);
+      return;
+    }
+
     const loadChildren = async () => {
+      setLoading(true);
       try {
         const res = await client.api.children.$get();
         if (res.ok) {
@@ -70,6 +101,8 @@ export const useApp = () => {
           setChildren(list);
           if (list.length > 0) {
             setActiveChild(list[0]);
+          } else {
+            setActiveChild(null);
           }
         }
       } catch (err) {
@@ -79,11 +112,15 @@ export const useApp = () => {
       }
     };
     loadChildren();
-  }, []);
+  }, [family]);
 
   // Load tasks and dayPlans when activeChild changes
   useEffect(() => {
-    if (!activeChild) return;
+    if (!activeChild) {
+      setTasks([]);
+      setDayPlans([]);
+      return;
+    }
     
     const loadData = async () => {
       try {
@@ -350,7 +387,54 @@ export const useApp = () => {
     }
   };
 
+  const handleLogin = async (name: string, passcode: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await client.api.auth.login.$post({ json: { name, passcode } });
+      const data = await res.json();
+      if (res.ok && data && 'family' in data) {
+        setFamily(data.family);
+        return { success: true };
+      } else {
+        const errorMsg = data && 'error' in data && typeof data.error === 'string' ? data.error : 'ログインに失敗しました';
+        return { success: false, error: errorMsg };
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: '通信エラーが発生しました' };
+    }
+  };
+
+  const handleRegister = async (name: string, passcode: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await client.api.auth.register.$post({ json: { name, passcode } });
+      const data = await res.json();
+      if (res.ok && data && 'family' in data) {
+        setFamily(data.family);
+        return { success: true };
+      } else {
+        const errorMsg = data && 'error' in data && typeof data.error === 'string' ? data.error : '登録に失敗しました';
+        return { success: false, error: errorMsg };
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: '通信エラーが発生しました' };
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await client.api.auth.logout.$post();
+    } catch (err) {
+      console.error("Failed to logout", err);
+    } finally {
+      setFamily(null);
+      setActiveTab('today');
+    }
+  };
+
   return {
+    family,
+    authLoading,
     activeTab,
     setActiveTab,
     children,
@@ -378,6 +462,9 @@ export const useApp = () => {
     pasteToDayPlan,
     pasteToWeekdays,
     handleCreateChild,
-    handleDeleteChild
+    handleDeleteChild,
+    handleLogin,
+    handleRegister,
+    handleLogout
   };
 };

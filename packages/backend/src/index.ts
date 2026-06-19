@@ -1,22 +1,177 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
+import { sign, verify } from 'hono/jwt';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { ChildSchema, TaskSchema } from '@my-app/shared';
+import { ChildSchema, TaskSchema, AuthSchema } from '@my-app/shared';
 
 type Bindings = {
   DB: D1Database;
+  JWT_SECRET?: string;
 };
 
-const app = new Hono<{ Bindings: Bindings }>().basePath('/api');
+type Variables = {
+  familyId: string;
+};
 
-app.use('*', cors());
+async function hashPasscode(passcode: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(passcode);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>().basePath('/api');
+
+app.use('*', cors({
+  origin: (origin) => origin || '*',
+  credentials: true,
+}));
+
+// JWT 認証ミドルウェア (特定のパスを保護)
+const authMiddleware = async (c: any, next: any) => {
+  const token = getCookie(c, 'token');
+  if (!token) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+  try {
+    const secret = c.env.JWT_SECRET || 'dev-secret-key-fallback';
+    const payload = await verify(token, secret, 'HS256');
+    c.set('familyId', payload.familyId);
+    await next();
+  } catch (err) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+};
+
+// 認証が必要なルートへの適用
+app.use('/children', authMiddleware);
+app.use('/children/*', authMiddleware);
+app.use('/tasks', authMiddleware);
+app.use('/tasks/*', authMiddleware);
+app.use('/day-plans', authMiddleware);
+app.use('/day-plans/*', authMiddleware);
 
 const routes = app
-  // 1. GET /children - Get children list
+  // -------------------------------------------------------------
+  // 1. Auth エンドポイント
+  // -------------------------------------------------------------
+  
+  // 新規登録
+  .post(
+    '/auth/register',
+    zValidator('json', AuthSchema),
+    async (c) => {
+      const { name, passcode } = c.req.valid('json');
+      
+      const existing = await c.env.DB.prepare('SELECT id FROM families WHERE name = ?')
+        .bind(name)
+        .first();
+      if (existing) {
+        return c.json({ success: false, error: 'この家庭名は既に登録されています' }, 400);
+      }
+
+      const id = Math.random().toString(36).substring(2, 11);
+      const passcodeHash = await hashPasscode(passcode);
+
+      await c.env.DB.prepare('INSERT INTO families (id, name, passcode_hash) VALUES (?, ?, ?)')
+        .bind(id, name, passcodeHash)
+        .run();
+
+      const secret = c.env.JWT_SECRET || 'dev-secret-key-fallback';
+      const token = await sign({
+        familyId: id,
+        name: name,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365
+      }, secret);
+
+      setCookie(c, 'token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365
+      });
+
+      return c.json({ success: true, family: { id, name } });
+    }
+  )
+
+  // ログイン
+  .post(
+    '/auth/login',
+    zValidator('json', AuthSchema),
+    async (c) => {
+      const { name, passcode } = c.req.valid('json');
+
+      const family = await c.env.DB.prepare('SELECT * FROM families WHERE name = ?')
+        .bind(name)
+        .first<any>();
+
+      if (!family) {
+        return c.json({ success: false, error: '家庭名または合言葉が間違っています' }, 401);
+      }
+
+      const passcodeHash = await hashPasscode(passcode);
+      if (family.passcode_hash !== passcodeHash) {
+        return c.json({ success: false, error: '家庭名または合言葉が間違っています' }, 401);
+      }
+
+      const secret = c.env.JWT_SECRET || 'dev-secret-key-fallback';
+      const token = await sign({
+        familyId: family.id,
+        name: family.name,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365
+      }, secret);
+
+      setCookie(c, 'token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365
+      });
+
+      return c.json({ success: true, family: { id: family.id, name: family.name } });
+    }
+  )
+
+  // セッション確認
+  .get('/auth/me', async (c) => {
+    const token = getCookie(c, 'token');
+    if (!token) {
+      return c.json({ success: false, error: '未ログインです' }, 401);
+    }
+    try {
+      const secret = c.env.JWT_SECRET || 'dev-secret-key-fallback';
+      const payload = await verify(token, secret, 'HS256');
+      return c.json({
+        success: true,
+        family: { id: payload.familyId as string, name: payload.name as string }
+      });
+    } catch (err) {
+      return c.json({ success: false, error: 'セッションが無効です' }, 401);
+    }
+  })
+
+  // ログアウト
+  .post('/auth/logout', async (c) => {
+    deleteCookie(c, 'token', { path: '/' });
+    return c.json({ success: true });
+  })
+
+  // -------------------------------------------------------------
+  // 2. 子ども管理 (Family-scoped)
+  // -------------------------------------------------------------
+
+  // 子ども一覧
   .get('/children', async (c) => {
-    const { results } = await c.env.DB.prepare('SELECT * FROM children').all();
+    const familyId = c.get('familyId');
+    const { results } = await c.env.DB.prepare('SELECT * FROM children WHERE family_id = ?')
+      .bind(familyId)
+      .all();
     const children = results.map((row: any) => ({
       id: row.id as string,
       name: row.name as string,
@@ -24,17 +179,18 @@ const routes = app
     return c.json(children);
   })
 
-  // 1.1 POST /children - Add a new child with default tasks seeded
+  // 新規追加
   .post(
     '/children',
     zValidator('json', ChildSchema),
     async (c) => {
       const child = c.req.valid('json');
+      const familyId = c.get('familyId');
       const statements = [];
       
       statements.push(
-        c.env.DB.prepare('INSERT INTO children (id, name) VALUES (?, ?)')
-          .bind(child.id, child.name)
+        c.env.DB.prepare('INSERT INTO children (id, name, family_id) VALUES (?, ?, ?)')
+          .bind(child.id, child.name, familyId)
       );
 
       const defaultTasks = [
@@ -59,26 +215,33 @@ const routes = app
     }
   )
 
-  // 1.2 DELETE /children/:id - Delete a child
+  // 削除
   .delete(
     '/children/:id',
     async (c) => {
       const id = c.req.param('id');
-      await c.env.DB.prepare('DELETE FROM children WHERE id = ?').bind(id).run();
+      const familyId = c.get('familyId');
+      await c.env.DB.prepare('DELETE FROM children WHERE id = ? AND family_id = ?')
+        .bind(id, familyId)
+        .run();
       return c.json({ success: true });
     }
   )
   
-  // 2. GET /tasks - Get tasks for a child
+  // -------------------------------------------------------------
+  // 3. タスクマスター管理 (Family-scoped via children join)
+  // -------------------------------------------------------------
+
   .get(
     '/tasks',
     zValidator('query', z.object({ childId: z.string() })),
     async (c) => {
       const { childId } = c.req.valid('query');
+      const familyId = c.get('familyId');
       const { results } = await c.env.DB.prepare(
-        'SELECT * FROM tasks WHERE child_id = ?'
+        'SELECT t.* FROM tasks t JOIN children c ON t.child_id = c.id WHERE t.child_id = ? AND c.family_id = ?'
       )
-        .bind(childId)
+        .bind(childId, familyId)
         .all();
 
       const mapped = results.map((row: any) => ({
@@ -92,12 +255,21 @@ const routes = app
     }
   )
 
-  // 3. POST /tasks - Create a task
   .post(
     '/tasks',
     zValidator('json', TaskSchema),
     async (c) => {
       const task = c.req.valid('json');
+      const familyId = c.get('familyId');
+
+      // Verify child belongs to this family
+      const child = await c.env.DB.prepare('SELECT id FROM children WHERE id = ? AND family_id = ?')
+        .bind(task.childId, familyId)
+        .first();
+      if (!child) {
+        return c.json({ success: false, error: 'Unauthorized' }, 401);
+      }
+
       await c.env.DB.prepare(
         'INSERT INTO tasks (id, name, icon, category, child_id) VALUES (?, ?, ?, ?, ?)'
       )
@@ -107,23 +279,33 @@ const routes = app
     }
   )
 
-  // 4. DELETE /tasks/:id - Delete a task
   .delete('/tasks/:id', async (c) => {
     const id = c.req.param('id');
-    await c.env.DB.prepare('DELETE FROM tasks WHERE id = ?').bind(id).run();
+    const familyId = c.get('familyId');
+
+    // Scope delete by checking if child belongs to the family
+    await c.env.DB.prepare(
+      'DELETE FROM tasks WHERE id = ? AND child_id IN (SELECT id FROM children WHERE family_id = ?)'
+    )
+      .bind(id, familyId)
+      .run();
     return c.json({ success: true });
   })
 
-  // 5. GET /day-plans - Get day plans for a child
+  // -------------------------------------------------------------
+  // 4. 日々の記録管理 (Family-scoped via children join)
+  // -------------------------------------------------------------
+
   .get(
     '/day-plans',
     zValidator('query', z.object({ childId: z.string() })),
     async (c) => {
       const { childId } = c.req.valid('query');
+      const familyId = c.get('familyId');
       const { results } = await c.env.DB.prepare(
-        'SELECT * FROM daily_task_instances WHERE child_id = ?'
+        'SELECT d.* FROM daily_task_instances d JOIN children c ON d.child_id = c.id WHERE d.child_id = ? AND c.family_id = ?'
       )
-        .bind(childId)
+        .bind(childId, familyId)
         .all();
 
       const plansMap = new Map<string, { morning: any[]; lunch: any[]; dinner: any[] }>();
@@ -156,7 +338,6 @@ const routes = app
     }
   )
 
-  // 6. POST /day-plans - Save (overwrite) a day plan for a child
   .post(
     '/day-plans',
     zValidator(
@@ -192,16 +373,23 @@ const routes = app
     ),
     async (c) => {
       const { date, childId, morning, lunch, dinner } = c.req.valid('json');
+      const familyId = c.get('familyId');
+
+      // Verify child belongs to this family
+      const child = await c.env.DB.prepare('SELECT id FROM children WHERE id = ? AND family_id = ?')
+        .bind(childId, familyId)
+        .first();
+      if (!child) {
+        return c.json({ success: false, error: 'Unauthorized' }, 401);
+      }
 
       const statements = [];
-      // Delete existing instances for this child and date
       statements.push(
         c.env.DB.prepare(
           'DELETE FROM daily_task_instances WHERE child_id = ? AND date = ?'
         ).bind(childId, date)
       );
 
-      // Helper to push insert statements
       const addInserts = (instances: any[], meal: string) => {
         for (const inst of instances) {
           statements.push(
@@ -224,7 +412,6 @@ const routes = app
       addInserts(lunch, 'lunch');
       addInserts(dinner, 'dinner');
 
-      // Run batch transaction
       await c.env.DB.batch(statements);
 
       return c.json({ success: true });
