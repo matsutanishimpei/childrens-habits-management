@@ -135,11 +135,16 @@ export const App = () => {
       {/* 画面ヘッダー */}
       <header className="no-print border-b border-stone-200 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center bg-white sticky top-0 z-10 card-shadow">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white" style={{ backgroundColor: 'var(--brand-primary)' }}>
-            <Sparkles className="w-5 h-5 text-teal-400" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-teal-400 p-1.5" style={{ backgroundColor: 'var(--brand-primary)' }}>
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <path d="M16 28C16 28 25 21 25 14C25 8.5 20.5 5 16 9.5C11.5 5 7 8.5 7 14C7 21 16 28 16 28Z" fill="currentColor" opacity="0.2" />
+              <path d="M16 28C16 24 16 18 16 15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M16 15C16 15 19 11.5 22.5 11.5C26 11.5 25.5 16 21.5 17C17.5 18 16 15 16 15Z" fill="currentColor" />
+              <path d="M16 18C16 18 12.5 15.5 9 15.5C5.5 15.5 6 19.5 10 20.5C14 21.5 16 18 16 18Z" fill="currentColor" opacity="0.85" />
+            </svg>
           </div>
           <div className="text-left">
-            <h1 className="text-lg font-bold tracking-tight text-stone-900 leading-tight">子どもたちの習慣管理</h1>
+            <h1 className="text-lg font-bold tracking-tight text-stone-900 leading-tight">ハビっと</h1>
             <p className="text-[10px] text-stone-400 font-bold leading-tight mt-0.5">{family.name}</p>
           </div>
         </div>

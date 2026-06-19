@@ -51,11 +51,16 @@ export const AuthView: React.FC<AuthViewProps> = ({ onLogin, onRegister }) => {
       >
         {/* アプリロゴ・ヘッダー */}
         <div className="flex flex-col items-center gap-2">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white bg-stone-800">
-            <Sparkles className="w-6 h-6 text-teal-400" />
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-teal-400 bg-stone-800 p-2">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <path d="M16 28C16 28 25 21 25 14C25 8.5 20.5 5 16 9.5C11.5 5 7 8.5 7 14C7 21 16 28 16 28Z" fill="currentColor" opacity="0.2" />
+              <path d="M16 28C16 24 16 18 16 15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              <path d="M16 15C16 15 19 11.5 22.5 11.5C26 11.5 25.5 16 21.5 17C17.5 18 16 15 16 15Z" fill="currentColor" />
+              <path d="M16 18C16 18 12.5 15.5 9 15.5C5.5 15.5 6 19.5 10 20.5C14 21.5 16 18 16 18Z" fill="currentColor" opacity="0.85" />
+            </svg>
           </div>
           <h1 className="text-xl font-bold tracking-tight text-stone-900 mt-2">
-            子どもたちの習慣管理
+            ハビっと
           </h1>
           <p className="text-xs text-stone-500">
             {isLogin ? '登録済みの家庭名と合言葉でログインします' : '新しい家庭名と合言葉でアカウントを作成します'}
