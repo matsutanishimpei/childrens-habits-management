@@ -179,20 +179,14 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   onDateSelect,
 }) => {
   const today = new Date();
-  // 「今月」を基準に、前月+今月の2ヶ月を表示
   const [baseYear, setBaseYear] = useState(today.getFullYear());
-  const [baseMonth, setBaseMonth] = useState(today.getMonth()); // 0-indexed（今月）
+  const [baseMonth, setBaseMonth] = useState(today.getMonth()); // 0-indexed（選択中の月）
 
   const navigate = (offset: number) => {
     const d = new Date(baseYear, baseMonth + offset, 1);
     setBaseYear(d.getFullYear());
     setBaseMonth(d.getMonth());
   };
-
-  // 前月の年月
-  const prevDate = new Date(baseYear, baseMonth - 1, 1);
-  const prevYear = prevDate.getFullYear();
-  const prevMonth = prevDate.getMonth();
 
   const todayStr = toLocalISOString(new Date());
 
@@ -209,10 +203,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
             <ChevronLeft className="w-5 h-5" />
           </button>
           <span className="font-bold text-base text-stone-800">
-            {prevYear === baseYear
-              ? `${prevMonth + 1}月 ・ ${baseMonth + 1}月`
-              : `${prevYear}年${prevMonth + 1}月 ・ ${baseYear}年${baseMonth + 1}月`
-            }
+            {baseYear}年{baseMonth + 1}月
           </span>
           <button
             onClick={() => navigate(1)}
@@ -223,16 +214,6 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
           </button>
         </div>
       </div>
-
-      {/* 前月 */}
-      <SingleMonthGrid
-        year={prevYear}
-        month={prevMonth}
-        dayPlans={dayPlans}
-        getDayPlan={getDayPlan}
-        todayStr={todayStr}
-        onDateSelect={onDateSelect}
-      />
 
       {/* 今月 */}
       <SingleMonthGrid
