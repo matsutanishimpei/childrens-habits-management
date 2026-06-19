@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Award } from 'lucide-react';
 import { DayPlan } from '@my-app/shared';
 import { toLocalISOString } from '../utils/date';
 
@@ -89,7 +89,7 @@ const SingleMonthGrid: React.FC<{
         <span className="font-bold text-sm text-stone-800">{monthLabel}</span>
         {daysWithTasks > 0 && (
           <div className="flex items-center gap-1.5">
-            <CalendarDays className="w-3.5 h-3.5 text-teal-600" />
+            <Award className="w-3.5 h-3.5 text-teal-600" />
             <span className="text-[11px] text-stone-500">
               <span className="font-bold text-stone-800">{daysCompleted}</span> / {daysWithTasks} 日達成
             </span>

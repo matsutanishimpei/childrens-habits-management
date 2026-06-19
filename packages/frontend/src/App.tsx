@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Sparkles, ChevronLeft, ChevronRight, CheckSquare, Calendar, CalendarDays, Settings,
+  Sparkles, ChevronLeft, ChevronRight, CheckSquare, Calendar, Award, Settings,
   Copy, Clipboard, Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -354,9 +354,9 @@ export const App = () => {
           className={`nav-button ${activeTab === 'calendar' ? 'active' : ''}`}
         >
           <div className="nav-icon-wrapper">
-            <CalendarDays className="w-5 h-5" />
+            <Award className="w-5 h-5" />
           </div>
-          月カレンダー
+          できた！きろく
         </button>
         
         <button 
