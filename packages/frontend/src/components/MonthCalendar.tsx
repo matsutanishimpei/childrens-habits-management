@@ -5,6 +5,7 @@ import { DayPlan } from '@my-app/shared';
 interface MonthCalendarProps {
   dayPlans: DayPlan[];
   getDayPlan: (dateStr: string) => DayPlan;
+  onDateSelect?: (dateStr: string) => void;
 }
 
 const DAY_LABELS = ['月', '火', '水', '木', '金', '土', '日'];
@@ -69,7 +70,8 @@ const SingleMonthGrid: React.FC<{
   dayPlans: DayPlan[];
   getDayPlan: (dateStr: string) => DayPlan;
   todayStr: string;
-}> = ({ year, month, dayPlans, getDayPlan, todayStr }) => {
+  onDateSelect?: (dateStr: string) => void;
+}> = ({ year, month, dayPlans, getDayPlan, todayStr, onDateSelect }) => {
   const cells = buildMonthCells(year, month);
   const monthLabel = `${year}年${month + 1}月`;
 
@@ -123,10 +125,11 @@ const SingleMonthGrid: React.FC<{
             return (
               <div
                 key={cell.dateStr}
+                onClick={() => onDateSelect?.(cell.dateStr)}
                 className={`
                   relative flex flex-col items-center justify-start pt-2 pb-3 min-h-[68px]
                   border-b border-r border-stone-50
-                  transition-colors duration-150
+                  transition-colors duration-150 cursor-pointer hover:bg-stone-50/50
                   ${!cell.inMonth ? 'opacity-30' : ''}
                   ${isToday ? 'bg-stone-50' : ''}
                 `}
@@ -150,14 +153,14 @@ const SingleMonthGrid: React.FC<{
 
                 {/* 完了マーク（余裕のあるスペース） */}
                 <div className="flex-1 flex items-center justify-center min-h-[24px]">
-                  {cell.inMonth && completed && (
+                  {cell.inMonth && hasTask && completed ? (
                     <span className="text-lg leading-none" title="全て完了！">⭕</span>
-                  )}
-                  {cell.inMonth && partial && (
+                  ) : cell.inMonth && hasTask && partial ? (
                     <span className="text-lg leading-none opacity-60" title="一部完了">△</span>
-                  )}
-                  {cell.inMonth && !hasTask && (
-                    <span className="text-sm leading-none text-stone-300" title="課題なし">—</span>
+                  ) : cell.inMonth && hasTask && !completed && !partial ? (
+                    <span className="text-base leading-none text-stone-400 font-bold" title="未着手">×</span>
+                  ) : (
+                    <span className="text-lg leading-none opacity-0 select-none" aria-hidden="true">⭕</span>
                   )}
                 </div>
               </div>
@@ -172,6 +175,7 @@ const SingleMonthGrid: React.FC<{
 export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   dayPlans,
   getDayPlan,
+  onDateSelect,
 }) => {
   const today = new Date();
   // 「今月」を基準に、前月+今月の2ヶ月を表示
@@ -226,6 +230,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         dayPlans={dayPlans}
         getDayPlan={getDayPlan}
         todayStr={todayStr}
+        onDateSelect={onDateSelect}
       />
 
       {/* 今月 */}
@@ -235,6 +240,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         dayPlans={dayPlans}
         getDayPlan={getDayPlan}
         todayStr={todayStr}
+        onDateSelect={onDateSelect}
       />
 
       {/* 凡例 */}
@@ -248,7 +254,11 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
           <span className="text-[10px] text-stone-400">一部完了</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-sm leading-none text-stone-300">—</span>
+          <span className="text-base leading-none text-stone-400 font-bold">×</span>
+          <span className="text-[10px] text-stone-400">未着手</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] leading-none text-stone-300 bg-stone-50 px-1 py-0.5 rounded border border-stone-200">空白</span>
           <span className="text-[10px] text-stone-400">課題なし</span>
         </div>
       </div>

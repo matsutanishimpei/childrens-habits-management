@@ -261,6 +261,10 @@ export const App = () => {
           <MonthCalendar
             dayPlans={dayPlans}
             getDayPlan={getDayPlan}
+            onDateSelect={(dateStr) => {
+              setSelectedDate(dateStr);
+              setActiveTab('today');
+            }}
           />
         )}
 
