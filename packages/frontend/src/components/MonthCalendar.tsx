@@ -160,13 +160,13 @@ const SingleMonthGrid: React.FC<{
                 {/* 完了マーク（余裕のあるスペース） */}
                 <div className="flex-1 flex items-center justify-center min-h-[24px]">
                   {cell.inMonth && hasTask && completed ? (
-                    <span className="text-lg leading-none" title="全て完了！">⭕</span>
+                    <span className="text-xl font-bold status-completed leading-none" title="全て完了！">○</span>
                   ) : cell.inMonth && hasTask && partial ? (
-                    <span className="text-lg leading-none opacity-60" title="一部完了">△</span>
+                    <span className="text-lg font-bold status-partial leading-none" title="一部完了">△</span>
                   ) : cell.inMonth && hasTask && !completed && !partial ? (
-                    <span className="text-base leading-none text-stone-400 font-bold" title="未着手">×</span>
+                    <span className="text-base font-bold status-unstarted leading-none" title="未着手">×</span>
                   ) : (
-                    <span className="text-lg leading-none" style={{ opacity: 0, userSelect: 'none' }} aria-hidden="true">⭕</span>
+                    <span className="text-xl leading-none" style={{ opacity: 0, userSelect: 'none' }} aria-hidden="true">○</span>
                   )}
                 </div>
               </div>
@@ -233,20 +233,20 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
       {/* 凡例 */}
       <div className="flex items-center justify-center gap-5 py-1">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm leading-none">⭕</span>
-          <span className="text-[10px] text-stone-400">全て完了</span>
+          <span className="text-lg font-bold status-completed leading-none">○</span>
+          <span className="text-[10px] text-stone-500">全て完了</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-sm leading-none opacity-60">△</span>
-          <span className="text-[10px] text-stone-400">一部完了</span>
+          <span className="text-base font-bold status-partial leading-none">△</span>
+          <span className="text-[10px] text-stone-500">一部完了</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-base leading-none text-stone-400 font-bold">×</span>
-          <span className="text-[10px] text-stone-400">未着手</span>
+          <span className="text-base font-bold status-unstarted leading-none">×</span>
+          <span className="text-[10px] text-stone-500">未着手</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] leading-none text-stone-300 bg-stone-50 px-1 py-0.5 rounded border border-stone-200">空白</span>
-          <span className="text-[10px] text-stone-400">課題なし</span>
+          <span className="text-[11px] leading-none status-none bg-stone-50 px-1 py-0.5 rounded border border-stone-200">空白</span>
+          <span className="text-[10px] text-stone-500">課題なし</span>
         </div>
       </div>
     </div>
