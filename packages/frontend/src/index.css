@@ -210,6 +210,17 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   flex-shrink: 0 !important;
 }
 
+/* Text Alignment */
+.text-center {
+  text-align: center !important;
+}
+.text-left {
+  text-align: left !important;
+}
+.text-right {
+  text-align: right !important;
+}
+
 /* Gaps */
 .gap-1\.5 { gap: 6px !important; }
 .gap-2 { gap: 8px !important; }
