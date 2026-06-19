@@ -87,10 +87,11 @@ const routes = app
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365
       }, secret);
 
+      const isSecure = c.req.url.startsWith('https://');
       setCookie(c, 'token', token, {
         httpOnly: true,
-        secure: c.req.url.startsWith('https://'),
-        sameSite: 'Lax',
+        secure: isSecure,
+        sameSite: isSecure ? 'None' : 'Lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 365
       });
@@ -126,10 +127,11 @@ const routes = app
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365
       }, secret);
 
+      const isSecure = c.req.url.startsWith('https://');
       setCookie(c, 'token', token, {
         httpOnly: true,
-        secure: c.req.url.startsWith('https://'),
-        sameSite: 'Lax',
+        secure: isSecure,
+        sameSite: isSecure ? 'None' : 'Lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 365
       });
@@ -158,7 +160,12 @@ const routes = app
 
   // ログアウト
   .post('/auth/logout', async (c) => {
-    deleteCookie(c, 'token', { path: '/' });
+    const isSecure = c.req.url.startsWith('https://');
+    deleteCookie(c, 'token', {
+      path: '/',
+      secure: isSecure,
+      sameSite: isSecure ? 'None' : 'Lax'
+    });
     return c.json({ success: true });
   })
 
