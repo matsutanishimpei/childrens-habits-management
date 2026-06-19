@@ -160,7 +160,7 @@ const SingleMonthGrid: React.FC<{
                   ) : cell.inMonth && hasTask && !completed && !partial ? (
                     <span className="text-base leading-none text-stone-400 font-bold" title="未着手">×</span>
                   ) : (
-                    <span className="text-lg leading-none opacity-0 select-none" aria-hidden="true">⭕</span>
+                    <span className="text-lg leading-none" style={{ opacity: 0, userSelect: 'none' }} aria-hidden="true">⭕</span>
                   )}
                 </div>
               </div>
