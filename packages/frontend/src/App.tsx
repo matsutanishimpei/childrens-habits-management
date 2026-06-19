@@ -46,8 +46,7 @@ export const App = () => {
     handleCreateChild,
     handleDeleteChild,
     handleLogin,
-    handleRegister,
-    handleLogout
+    handleRegister
   } = useApp();
 
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -152,15 +151,6 @@ export const App = () => {
             activeChild={activeChild}
             setActiveChild={setActiveChild}
           />
-
-          {/* ログアウトボタン */}
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-500 hover:text-stone-800 hover:bg-stone-50 text-[11px] font-bold transition-all"
-            title="ログアウト"
-          >
-            ログアウト
-          </button>
         </div>
       </header>
 
