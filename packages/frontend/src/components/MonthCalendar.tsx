@@ -104,9 +104,14 @@ const SingleMonthGrid: React.FC<{
           {DAY_LABELS.map((label, i) => (
             <div
               key={label}
-              className={`text-center py-2 text-[11px] font-bold tracking-wide ${
-                i === 5 ? 'text-blue-400' : i === 6 ? 'text-red-400' : 'text-stone-400'
-              }`}
+              className="text-center py-2 text-[11px] font-bold tracking-wide"
+              style={
+                i === 5
+                  ? { color: '#1D4ED8', backgroundColor: '#EFF6FF' }
+                  : i === 6
+                    ? { color: '#EF4444', backgroundColor: '#FEF2F2' }
+                    : { color: '#A8A29E' }
+              }
             >
               {label}
             </div>
@@ -132,19 +137,19 @@ const SingleMonthGrid: React.FC<{
                   border-b border-r border-stone-50
                   transition-colors duration-150 cursor-pointer hover:bg-stone-50/50
                   ${!cell.inMonth ? 'opacity-30' : ''}
-                  ${isToday ? 'bg-stone-50' : ''}
                 `}
+                style={isToday ? { backgroundColor: '#F3F4F6' } : undefined}
               >
                 {/* 日付番号 */}
                 <span
                   className={`
-                    text-xs font-medium leading-none
+                    text-xs font-medium leading-none transition-all
                     ${isToday 
-                      ? 'w-6 h-6 flex items-center justify-center rounded-full bg-stone-800 text-white font-bold' 
+                      ? 'font-bold text-stone-900' 
                       : colIdx === 5 
-                        ? 'text-blue-400' 
+                        ? 'text-blue-600' 
                         : colIdx === 6 
-                          ? 'text-red-400' 
+                          ? 'text-red-500' 
                           : 'text-stone-600'
                     }
                   `}
