@@ -6,7 +6,7 @@ compatibility_date = "2024-04-03"
 [[d1_databases]]
 binding = "DB"
 database_name = "childrens-habits"
-database_id = "local-db-id-dummy"
+database_id = "20e1b051-ab81-4686-b09e-b88322e029af"
 migrations_dir = "migrations"
 
 # [vars]
