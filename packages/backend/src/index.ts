@@ -1,5 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { ChildSchema, TaskSchema } from '@my-app/shared';
@@ -9,6 +10,8 @@ type Bindings = {
 };
 
 const app = new Hono<{ Bindings: Bindings }>().basePath('/api');
+
+app.use('*', cors());
 
 const routes = app
   // 1. GET /children - Get children list
