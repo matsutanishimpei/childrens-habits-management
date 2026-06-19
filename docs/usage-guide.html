@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ハビっと ユーザー向け使い方手順書</title>
+  <style>
+    :root {
+      --bg: #f6f4ee;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #667085;
+      --line: #e5e1d8;
+      --accent: #0f766e;
+      --accent-soft: #d9f0ee;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Yu Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, #f9f8f4 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+    .hero {
+      background: radial-gradient(circle at top right, #d9f0ee 0, #d9f0ee 22%, #ffffff 48%, #ffffff 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 12px 40px rgba(31, 41, 51, 0.07);
+      margin-bottom: 24px;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 6px 12px;
+      margin-bottom: 16px;
+    }
+    h1, h2, h3 { line-height: 1.25; margin: 0; }
+    h1 { font-size: 34px; margin-bottom: 12px; }
+    h2 {
+      font-size: 22px;
+      margin-top: 36px;
+      margin-bottom: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+    h3 { font-size: 18px; margin: 0 0 10px; }
+    p { margin: 0 0 12px; }
+    ol, ul { margin: 8px 0 16px 20px; padding: 0; }
+    li { margin: 4px 0; }
+    .lead { color: var(--muted); max-width: 65ch; }
+    .callout {
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--accent);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin: 18px 0 28px;
+    }
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      margin-top: 18px;
+      box-shadow: 0 10px 30px rgba(31, 41, 51, 0.05);
+      break-inside: avoid;
+    }
+    .section img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      display: block;
+      margin-top: 14px;
+      background: #fff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .note {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef7f5;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    @media print {
+      body { background: white; }
+      .page { padding: 0; }
+      .hero, .section { box-shadow: none; }
+      .section { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">HABIT MANAGEMENT GUIDE</div>
+      <h1>ハビっと ユーザー向け使い方手順書</h1>
+      <p class="lead">ローカル起動した <strong>ハビっと</strong> の基本操作を、画面ごとにわかりやすくまとめた手順書です。ログインから毎日のチェック、月ごとの記録まで、この 1 枚で流れを追えるようにしています。</p>
+      <div class="callout">
+        <strong>先に確認すること</strong>
+        <ol>
+          <li>ログイン画面で家庭名と合言葉を入力します。</li>
+          <li>画面上部の子どもボタンで、操作したい子どもを選びます。</li>
+          <li>下部のナビゲーションで、使いたい画面を切り替えます。</li>
+        </ol>
+      </div>
+      <p class="note">ログイン用のテストデータは、ローカル D1 に入れてある「テスト家族」です。</p>
+    </section>
+
+    <section class="section">
+      <div class="badge">LOGIN</div>
+      <h2>ログイン</h2>
+      <p>登録済みの家庭名と合言葉でログインします。新しく使い始める場合は、新規登録から家庭を作成してください。</p>
+      <img src="screenshots/01_today.png" alt="ログイン画面のサンプル" />
+    </section>
+
+    <section class="section">
+      <div class="badge">DAILY CHECK</div>
+      <h2>1. 今日のチェック</h2>
+      <p>その日の朝食・昼食・夕食ごとに、タスクの完了状況を確認する画面です。</p>
+      <ol>
+        <li>日付の左右ボタンで、確認したい日を切り替えます。</li>
+        <li>各食事ブロックで、タスクの完了を確認します。</li>
+        <li>ページ数や回数などの記録も、この画面で入力します。</li>
+      </ol>
+      <img src="screenshots/01_today.png" alt="今日のチェック画面のサンプル" />
+    </section>
+
+    <section class="section">
+      <div class="badge">PLAN</div>
+      <h2>2. 週の計画作成</h2>
+      <p>1週間の予定をまとめて組み立てる画面です。タスクのコピーや貼り付けをするときに便利です。</p>
+      <ol>
+        <li>上部の左右ボタンで、表示する週を切り替えます。</li>
+        <li>中央の曜日ボタンから日付を選びます。</li>
+        <li>予定のコピーや、他の日への貼り付けを行います。</li>
+      </ol>
+      <img src="screenshots/02_plan.png" alt="週の計画作成画面のサンプル" />
+    </section>
+
+    <section class="section">
+      <div class="badge">CALENDAR</div>
+      <h2>3. できた！きろく</h2>
+      <p>月ごとの達成状況をカレンダーで確認する画面です。子どもごとの進捗をざっくり見たいときに使います。</p>
+      <ol>
+        <li>上部の左右ボタンで月を切り替えます。</li>
+        <li>○、△、× のマークで、その日の進捗を見ます。</li>
+        <li>気になる日を押すと、その日のチェック画面へ移動できます。</li>
+      </ol>
+      <img src="screenshots/03_calendar_hanako.png" alt="できた！きろく画面のサンプル" />
+    </section>
+
+    <div class="grid">
+      <section class="section">
+        <div class="badge">TASKS</div>
+        <h2>4. タスク設定</h2>
+        <p>子どもごとのタスクを追加・削除する画面です。毎日のルーティンや宿題を登録します。</p>
+        <ol>
+          <li>タスクを追加したいときは、新規追加ボタンを押します。</li>
+          <li>名前やアイコン、カテゴリを設定します。</li>
+          <li>不要になったタスクは削除ボタンで消します。</li>
+        </ol>
+        <img src="screenshots/04_tasks.png" alt="タスク設定画面のサンプル" />
+      </section>
+
+      <section class="section">
+        <div class="badge">CHILDREN</div>
+        <h2>5. 子ども設定</h2>
+        <p>家庭に紐づく子どもを登録・削除する画面です。家族ごとの管理を始めるときに使います。</p>
+        <ol>
+          <li>新しい子どもを登録して、対象を増やします。</li>
+          <li>使わなくなった子どもは削除できます。</li>
+          <li>子どもを切り替えると、表示中のタスクや記録も切り替わります。</li>
+        </ol>
+        <img src="screenshots/05_children.png" alt="子ども設定画面のサンプル" />
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>迷ったときの見方</h2>
+      <ul>
+        <li>左右のボタンは、日付や週、月を切り替える操作です。</li>
+        <li>画面下のナビゲーションで、今いる場所を切り替えられます。</li>
+        <li>画面上の子どもボタンで、対象の子どもを切り替えられます。</li>
+      </ul>
+    </section>
+
+    <section class="footer">
+      <p>この PDF は、ローカル起動した画面をもとに作成しています。画像は <code>docs/screenshots</code> 配下のキャプチャを使っています。</p>
+      <p>Markdown 版は <code>docs/usage-guide.md</code> にあります。</p>
+    </section>
+  </main>
+</body>
+</html>
