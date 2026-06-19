@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Sparkles, ChevronLeft, ChevronRight, CheckSquare, Calendar, Settings,
+  Sparkles, ChevronLeft, ChevronRight, CheckSquare, Calendar, CalendarDays, Settings,
   Copy, Clipboard, Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,6 +11,7 @@ import { CalendarSlider } from './components/CalendarSlider';
 import { TaskSettings } from './components/TaskSettings';
 import { AddTaskModal } from './components/AddTaskModal';
 import { ChildSettings } from './components/ChildSettings';
+import { MonthCalendar } from './components/MonthCalendar';
 
 export const App = () => {
   const {
@@ -255,7 +256,15 @@ export const App = () => {
           </motion.div>
         )}
 
-        {/* 3. 【タスク設定】タスク登録・マスタ管理画面 */}
+        {/* 3. 【月カレンダー】月ごとの達成状況 */}
+        {activeTab === 'calendar' && (
+          <MonthCalendar
+            dayPlans={dayPlans}
+            getDayPlan={getDayPlan}
+          />
+        )}
+
+        {/* 4. 【タスク設定】タスク登録・マスタ管理画面 */}
         {activeTab === 'tasks' && (
           <TaskSettings
             tasks={tasks}
@@ -264,7 +273,7 @@ export const App = () => {
           />
         )}
 
-        {/* 4. 【子ども設定】子ども管理画面 */}
+        {/* 5. 【子ども設定】子ども管理画面 */}
         {activeTab === 'children' && (
           <ChildSettings
             childrenList={children}
@@ -296,6 +305,16 @@ export const App = () => {
             <Calendar className="w-5 h-5" />
           </div>
           週の計画作成
+        </button>
+        
+        <button 
+          onClick={() => setActiveTab('calendar')}
+          className={`nav-button ${activeTab === 'calendar' ? 'active' : ''}`}
+        >
+          <div className="nav-icon-wrapper">
+            <CalendarDays className="w-5 h-5" />
+          </div>
+          月カレンダー
         </button>
         
         <button 

@@ -34,7 +34,7 @@ export const isCustomValue = (val: string | undefined, unit: UnitType): boolean 
 };
 
 export const useApp = () => {
-  const [activeTab, setActiveTab] = useState<'today' | 'plan' | 'tasks' | 'children'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'plan' | 'calendar' | 'tasks' | 'children'>('today');
   const [children, setChildren] = useState<Child[]>([]);
   const [activeChild, setActiveChild] = useState<Child | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
