@@ -1,5 +1,33 @@
 {
-  "name": "my-app-monorepo",
+  "name": "childrens-habits-management",
+  "version": "1.0.0",
+  "description": "子どもの生活習慣（ハビット）管理アプリケーション。Hono (Backend), Vite/React (Frontend), Zod (Shared) を組み合わせた型安全なモノレポ構成です。",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matsutanishimpei/childrens-habits-management.git"
+  },
+  "bugs": {
+    "url": "https://github.com/matsutanishimpei/childrens-habits-management/issues"
+  },
+  "homepage": "https://github.com/matsutanishimpei/childrens-habits-management#readme",
+  "license": "MIT",
+  "keywords": [
+    "hono",
+    "react",
+    "zod",
+    "typescript",
+    "cloudflare-workers",
+    "cloudflare-d1",
+    "sqlite",
+    "vite",
+    "tailwindcss",
+    "monorepo",
+    "npm-workspaces",
+    "react-hook-form",
+    "children",
+    "habits",
+    "management"
+  ],
   "private": true,
   "workspaces": [
     "packages/*"
