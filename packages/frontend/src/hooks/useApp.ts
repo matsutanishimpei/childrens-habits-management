@@ -394,8 +394,9 @@ export const useApp = () => {
     try {
       const res = await client.api.auth.login.$post({ json: { name, passcode } });
       const data = await res.json();
-      if (res.ok && data && 'family' in data) {
-        setFamily(data.family);
+      if (res.ok && data && 'family' in data && 'token' in data) {
+        localStorage.setItem('token', data.token as string);
+        setFamily(data.family as any);
         return { success: true };
       } else {
         const errorMsg = data && 'error' in data && typeof data.error === 'string' ? data.error : 'ログインに失敗しました';
@@ -411,8 +412,9 @@ export const useApp = () => {
     try {
       const res = await client.api.auth.register.$post({ json: { name, passcode } });
       const data = await res.json();
-      if (res.ok && data && 'family' in data) {
-        setFamily(data.family);
+      if (res.ok && data && 'family' in data && 'token' in data) {
+        localStorage.setItem('token', data.token as string);
+        setFamily(data.family as any);
         return { success: true };
       } else {
         const errorMsg = data && 'error' in data && typeof data.error === 'string' ? data.error : '登録に失敗しました';
@@ -430,6 +432,7 @@ export const useApp = () => {
     } catch (err) {
       console.error("Failed to logout", err);
     } finally {
+      localStorage.removeItem('token');
       setFamily(null);
       setActiveTab('today');
     }

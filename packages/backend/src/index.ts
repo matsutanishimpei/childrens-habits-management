@@ -32,10 +32,11 @@ app.use('*', cors({
 
 // JWT 認証ミドルウェア (特定のパスを保護)
 const authMiddleware = async (c: any, next: any) => {
-  const token = getCookie(c, 'token');
-  if (!token) {
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
+  const token = authHeader.substring(7);
   try {
     const secret = c.env.JWT_SECRET || 'dev-secret-key-fallback';
     const payload = await verify(token, secret, 'HS256');
@@ -87,16 +88,7 @@ const routes = app
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365
       }, secret);
 
-      const isSecure = c.req.url.startsWith('https://');
-      setCookie(c, 'token', token, {
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: isSecure ? 'None' : 'Lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 365
-      });
-
-      return c.json({ success: true, family: { id, name } });
+      return c.json({ success: true, token, family: { id, name } });
     }
   )
 
@@ -127,25 +119,17 @@ const routes = app
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365
       }, secret);
 
-      const isSecure = c.req.url.startsWith('https://');
-      setCookie(c, 'token', token, {
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: isSecure ? 'None' : 'Lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 365
-      });
-
-      return c.json({ success: true, family: { id: family.id, name: family.name } });
+      return c.json({ success: true, token, family: { id: family.id, name: family.name } });
     }
   )
 
   // セッション確認
   .get('/auth/me', async (c) => {
-    const token = getCookie(c, 'token');
-    if (!token) {
+    const authHeader = c.req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, error: '未ログインです' }, 401);
     }
+    const token = authHeader.substring(7);
     try {
       const secret = c.env.JWT_SECRET || 'dev-secret-key-fallback';
       const payload = await verify(token, secret, 'HS256');
@@ -160,12 +144,6 @@ const routes = app
 
   // ログアウト
   .post('/auth/logout', async (c) => {
-    const isSecure = c.req.url.startsWith('https://');
-    deleteCookie(c, 'token', {
-      path: '/',
-      secure: isSecure,
-      sameSite: isSecure ? 'None' : 'Lax'
-    });
     return c.json({ success: true });
   })
 
