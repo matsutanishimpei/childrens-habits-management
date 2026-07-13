@@ -35,7 +35,7 @@
   "scripts": {
     "dev:backend": "npm run dev --workspace=@my-app/backend",
     "dev:frontend": "npm run dev --workspace=@my-app/frontend",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspaces --if-present",
     "typecheck": "tsc --noEmit"
   },
   "optionalDependencies": {
